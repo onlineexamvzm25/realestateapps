@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homepage</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Font Awesome for icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-xXf08PvOzayLlF53F2q6+1Oozdq8YQe7Hd8OVg/O8k0eGQQFFOl2w+YjP3sv08wU+lw6RgCGL8db1r7B8UnRyg=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+</head>
+<body>
+  <div class="button-container">
+    <button onclick="handleSites()"><i class="fas fa-globe"></i> SITES</button>
+    <button onclick="handleCustomers()"><i class="fas fa-users"></i> CUSTOMERS</button>
+    <button onclick="handleSettlements()"><i class="fas fa-handshake"></i> SETTLEMENTS</button>
+    <button onclick="handleReports()"><i class="fas fa-chart-line"></i> ADMIN REPORTS</button>
+    <button onclick="handleUsers()"><i class="fas fa-user-cog"></i> USERS</button>
+    <button onclick="handleClose()"><i class="fas fa-times-circle"></i> CLOSE</button>
+  </div>
+
+  <script>
+    function handleSites() {
+     window.location.href = "sitesinfo.html";
+    }
+
+    function handleCustomers() {
+       window.location.href = "customerinfo.html";
+    }
+
+    function handleSettlements() {
+      window.location.href = "settelements.html";
+    }
+
+    function handleReports() {
+      window.location.href = "adminreports.html";
+    }
+
+    function handleUsers() {
+      alert("USERS button clicked");
+    }
+
+    function handleClose() {
+      alert("CLOSE button clicked");
+    }
+  </script>
+</body>
+</html>
