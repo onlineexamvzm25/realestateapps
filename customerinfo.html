@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Info</title>
+  <link rel="stylesheet" href="customer.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Customer Information</h1>
+
+    <div class="button-group">
+      <button id="configureBtn" class="btn">CONFIGURE CUSTOMER</button>
+      <button id="loadBtn" class="btn secondary">LOAD ALL CUSTOMERS</button>
+      <button id="assignBtn" class="btn secondary"  onclick="assignSite()">ASSIGN SITE</button>
+      <button class="btn" onclick="goToHomePage()">HOME</button>
+    </div>
+
+    <div id="formContainer"></div>
+  </div>
+
+  <script>
+    // ✅ Supabase credentials
+      const supabaseUrl = 'https://rqsiopzedqyucvptwsjk.supabase.co';
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxc2lvcHplZHF5dWN2cHR3c2prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2MTg4NjgsImV4cCI6MjA3MjE5NDg2OH0.rY6opU6M5UMaaUe2Mp9FjVOue9Vd9_8vXruJ3Vts_Ww';
+
+      supabase = supabase.createClient(supabaseUrl, supabaseKey); // ✅ Use window
+
+        
+    const configureBtn = document.getElementById('configureBtn');
+    const loadBtn = document.getElementById('loadBtn');
+    const formContainer = document.getElementById('formContainer');
+
+    // ✅ CONFIGURE CUSTOMER (show form)
+    configureBtn.addEventListener('click', () => {
+      formContainer.innerHTML = ''; // Clear any existing content (form or table)
+
+      const formHTML = `
+        <form id="customerForm" class="form">
+          <label>Customer ID: <input type="text" id="customerId" required></label><br>
+          <label>Customer Name: <input type="text" id="customerName" required></label><br>
+          <label>Contact No: <input type="number" id="contactNo" required></label><br>
+          <label>Address: <input type="text" id="address" required></label><br>
+          <label>Remarks: <input type="text" id="remarks"></label><br>
+          <button type="submit" class="btn">ADD CUSTOMER</button>
+        </form>
+      `;
+
+      formContainer.innerHTML = formHTML;
+    });
+
+    // ✅ LOAD CUSTOMER (show data table)
+    loadBtn.addEventListener('click', async () => {
+      formContainer.innerHTML = ''; // Remove form or existing table
+
+      // Fetch data from Supabase
+      const { data, error } = await supabase.from('customers').select('*');
+
+      if (error) {
+        formContainer.innerHTML = `<p style="color:red;">Error loading customers: ${error.message}</p>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        formContainer.innerHTML = `<h2>ALL CUSTOMERS</h2><p>No customer records found.</p>`;
+        return;
+      }
+
+      // Create table
+      let tableHTML = `<h2>ALL CUSTOMERS</h2><table border="1"><thead><tr>`;
+      const headers = ['CID', 'CNAME', 'CONTACTNO', 'ADDRESS', 'JOINDATE', 'REMARKS'];
+      headers.forEach(header => tableHTML += `<th>${header}</th>`);
+      tableHTML += `</tr></thead><tbody>`;
+
+      data.forEach(row => {
+        tableHTML += `<tr>
+          <td>${row.cid}</td>
+          <td>${row.cname}</td>
+          <td>${row.contactno}</td>
+          <td>${row.address}</td>
+          <td>${row.joindate ? new Date(row.joindate).toLocaleDateString() : ''}</td>
+          <td>${row.remarks || ''}</td>
+        </tr>`;
+      });
+
+      tableHTML += `</tbody></table>`;
+      formContainer.innerHTML = tableHTML;
+    });
+
+    // ✅ Handle form submission (insert into Supabase)
+    document.addEventListener('submit', async function(event) {
+      if (event.target && event.target.id === 'customerForm') {
+        event.preventDefault();
+
+        const cid = document.getElementById('customerId').value.trim();
+        const cname = document.getElementById('customerName').value.trim();
+        const contactno = document.getElementById('contactNo').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const remarks = document.getElementById('remarks').value.trim();
+
+        const joindate = new Date().toISOString(); // Current date
+
+        const { error } = await supabase.from('customers').insert([
+          { cid, cname, contactno, address, remarks, joindate }
+        ]);
+
+        if (error) {
+          alert('Error adding customer: ' + error.message);
+        } else {
+          alert('Customer added successfully!');
+          event.target.reset();
+        }
+      }
+    });
+
+
+    function assignSite(){
+      //set assign site page
+    }
+    function goToHomePage() {
+      window.location.href = "homepage.html";
+    }
+  </script>
+
+</body>
+</html>

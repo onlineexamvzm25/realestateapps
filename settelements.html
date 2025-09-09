@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Site-Customer Assignment</title>
+  <link rel="stylesheet" href="settlement.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Assign Site to Customer</h2>
+
+    <label for="siteSelect">SELECT SITE NAME:</label>
+    <select id="siteSelect">
+      <option value="">None</option>
+    </select>
+
+    <label for="customerSelect">SELECT CUSTOMER:</label>
+    <select id="customerSelect">
+      <option value="">None</option>
+    </select>
+
+    <label for="dateSelect">SELECT DATE:</label>
+    <input type="date" id="dateSelect">
+
+    <label for="remarks">REMARKS:</label>
+    <input type="text" id="remarks" maxlength="50" placeholder="Enter remarks (max 50 chars)">
+
+    <button id="assignBtn">ASSIGN</button> 
+    <button id="homeBtn"  onClick="goToHomePage()">HOME</button>
+
+    <div id="statusMsg"></div>
+  </div>
+
+  <script>
+    // Supabase credentials
+    const supabaseUrl = 'https://rqsiopzedqyucvptwsjk.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxc2lvcHplZHF5dWN2cHR3c2prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2MTg4NjgsImV4cCI6MjA3MjE5NDg2OH0.rY6opU6M5UMaaUe2Mp9FjVOue9Vd9_8vXruJ3Vts_Ww';
+
+    supabase = supabase.createClient(supabaseUrl, supabaseKey); // ✅ Use window
+
+    let sites = [];
+    let customers = [];
+
+    async function loadData() {
+      const { data: siteData, error: siteError } = await supabase
+        .from('sites')
+        .select('sid, sname');
+
+      if (siteError) {
+        console.error('Site load error:', siteError);
+        return;
+      }
+
+      sites = siteData.sort((a, b) => a.sname.localeCompare(b.sname));
+      const siteSelect = document.getElementById('siteSelect');
+      sites.forEach(site => {
+        const option = document.createElement('option');
+        option.value = site.sid;
+        option.text = site.sname;
+        siteSelect.appendChild(option);
+      });
+
+      const { data: customerData, error: customerError } = await supabase
+        .from('customers')
+        .select('cid, cname, contactno');
+
+      if (customerError) {
+        console.error('Customer load error:', customerError);
+        return;
+      }
+
+      customers = customerData.sort((a, b) => a.cname.localeCompare(b.cname));
+      const customerSelect = document.getElementById('customerSelect');
+      customers.forEach(customer => {
+        const option = document.createElement('option');
+        option.value = customer.cid;
+        option.text = customer.cname;
+        customerSelect.appendChild(option);
+      });
+
+      // Set default date
+      document.getElementById('dateSelect').valueAsDate = new Date();
+    }
+
+    function getSNameBySid(sid) {
+      const found = sites.find(site => site.sid == sid);
+      return found ? found.sname : '';
+    }
+
+    function getSidBySName(sname) {
+      const found = sites.find(site => site.sname == sname);
+      return found ? found.sid : null;
+    }
+
+    function getCNameByCid(cid) {
+      const found = customers.find(c => c.cid == cid);
+      return found ? found.cname : '';
+    }
+
+    function getCidByCName(cname) {
+      const found = customers.find(c => c.cname == cname);
+      return found ? found.cid : null;
+    }
+
+    function getContactNoByCid(cid) {
+      const found = customers.find(c => c.cid == cid);
+      return found ? found.contactno : '';
+    }
+
+    async function assignSiteToCustomer() {
+      const sid = document.getElementById('siteSelect').value;
+      const cid = document.getElementById('customerSelect').value;
+      const showndate = document.getElementById('dateSelect').value;
+      const remarks = document.getElementById('remarks').value;
+      const shownby = 'MAHESH';
+
+      if (!sid || !cid) {
+        alert('Please select both site and customer.');
+        return;
+      }
+
+      const sname = getSNameBySid(sid);
+      const cname = getCNameByCid(cid);
+      const contactno = getContactNoByCid(cid);
+
+    const { data: existing, error: selectError } = await supabase
+    .from('sitewithcustomers')
+    .select('*') // You can just select a single column, or use '*'
+    .eq('sid', sid)
+    .eq('cid', cid)
+    .limit(1);
+
+    if (existing && existing.length > 0) {
+    // Combination already exists
+    alert("This site is already assigned to this customer");
+     document.getElementById('siteSelect').value = '';
+     document.getElementById('customerSelect').value = '';
+    return;
+  }
+
+      const { error } = await supabase.from('sitewithcustomers').insert([
+        { sid, sname, cid, cname, contactno, showndate, remarks, shownby }
+      ]);
+
+      const statusMsg = document.getElementById('statusMsg');
+      if (error) {
+        statusMsg.textContent = "Error assigning: " + error.message;
+        statusMsg.style.color = "red";
+      } else {
+        statusMsg.textContent = "Assignment successful!";
+        statusMsg.style.color = "green";
+
+        // ✅ Clear input fields
+        document.getElementById('siteSelect').value = '';
+        document.getElementById('customerSelect').value = '';
+        document.getElementById('remarks').value = '';
+        document.getElementById('dateSelect').valueAsDate = new Date();  // Reset to today's date
+      }
+    }
+
+    document.getElementById('assignBtn').addEventListener('click', assignSiteToCustomer);
+    window.onload = loadData;
+
+
+    function goToHomePage() {
+      window.location.href = "homepage.html";
+    }
+  </script>
+</body>
+</html>

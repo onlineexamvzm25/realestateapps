@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sites Info</title>
+    <link rel="stylesheet" href="sites.css">
+
+    <!-- Include Supabase JS client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+    <script>
+       const supabaseUrl = 'https://rqsiopzedqyucvptwsjk.supabase.co';
+       const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxc2lvcHplZHF5dWN2cHR3c2prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2MTg4NjgsImV4cCI6MjA3MjE5NDg2OH0.rY6opU6M5UMaaUe2Mp9FjVOue9Vd9_8vXruJ3Vts_Ww';
+
+        supabase = supabase.createClient(supabaseUrl, supabaseKey); // ✅ Use window
+
+        
+        async function addSite() {
+            const form = document.querySelector("#siteForm form");
+
+           
+
+            // Get values from form inputs
+            const data = {
+                sid: document.getElementById('siteId').value,
+                sname: document.getElementById('siteName').value,
+                sstatus: document.getElementById('siteStatus').value,
+                plotno: document.getElementById('plotNo').value,
+                sizes: document.getElementById('sizes').value,
+                facing: document.getElementById('facing').value,
+                n_axis: document.getElementById('nAxis').value,
+                s_axis: document.getElementById('sAxis').value,
+                layout: document.getElementById('layout').value,
+                address: document.getElementById('address').value,
+                remarks: document.getElementById('remarks').value,
+                addeddate: new Date().toISOString().split('T')[0], // "2025-09-03", // current timestamp
+                solddate: "NA", // can be updated later
+                addedby: "Mahesh" // or set dynamically
+            };
+
+
+            // Insert into Supabase
+            const { error } = await supabase
+                .from('sites')
+                .insert([data]);
+
+            if (error) {
+                alert("Error adding site: " + error.message);
+            } else {
+                alert("Site added successfully!");
+                form.reset();
+            }
+        }
+
+       function showAddSiteForm() {
+    // Show the form
+    document.getElementById("siteForm").style.display = "block";
+
+    // Hide the ALL SITES table if it's visible
+    document.getElementById("allSitesContainer").style.display = "none";
+
+    // Clear any previous form data
+    document.querySelector("#siteForm form").reset();
+}
+
+
+        async function loadAllSites() {
+    // Hide site form
+    document.getElementById("siteForm").style.display = "none";
+
+    // Clear previous content
+    const container = document.getElementById("allSitesContainer");
+    container.innerHTML = "";
+    container.style.display = "block";
+
+    // Fetch data from Supabase
+    const { data, error } = await supabase
+        .from('sites')
+        .select('*');
+
+    if (error) {
+        alert("Error loading sites: " + error.message);
+        return;
+    }
+
+    if (data.length === 0) {
+        container.innerHTML = "<p>No site records found.</p>";
+        return;
+    }
+
+    // Create table
+    const table = document.createElement("table");
+    table.border = "1";
+    table.cellPadding = "8";
+    table.style.borderCollapse = "collapse";
+    table.style.width = "100%";
+
+    // Table heading
+    const heading = document.createElement("h2");
+    heading.textContent = "ALL SITES";
+    container.appendChild(heading);
+
+    // Table headers
+    const headers = [
+        "SITE ID", "SITE NAME", "SITE STATUS", "PLOTNO", "SIZE",
+        "FACING", "NORTHC", "SOUTHC", "LAYOUT", "ADDRESS",
+        "REMARKS", "ADDED DATE", "SOLD DATE", "ADDED BY"
+    ];
+
+    const headerRow = document.createElement("tr");
+    headers.forEach(h => {
+        const th = document.createElement("th");
+        th.textContent = h;
+        th.style.background = "#f0f0f0";
+        th.style.textAlign = "left";
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    // Table rows
+    data.forEach(site => {
+        const row = document.createElement("tr");
+
+        [
+            site.sid, site.sname, site.sstatus, site.plotno, site.sizes,
+            site.facing, site.n_axis, site.s_axis, site.layout, site.address,
+            site.remarks, site.addeddate, site.solddate, site.addedby
+        ].forEach(value => {
+            const td = document.createElement("td");
+            td.textContent = value || "";
+            row.appendChild(td);
+        });
+
+        table.appendChild(row);
+    });
+
+    container.appendChild(table);
+}
+
+       function assignCustomer(){
+        //set customer assign page
+       }
+        function goToHomePage() {
+            window.location.href = "homepage.html";
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Sites Information</h1>
+
+        <div class="button-group">
+            <button onclick="showAddSiteForm()">ADD NEW SITE</button>
+            <button onclick="loadAllSites()">LOAD ALL SITES</button>
+            <button onclick="assignCustomer()">ASSIGN CUSTOMR</button>
+            <button onclick="goToHomePage()">HOME</button>
+        </div>
+
+        <div id="siteForm" class="form-container" style="display: none;">
+            <form>
+                <div class="form-group">
+                    <label for="siteId">SITE ID</label>
+                    <input type="text" id="siteId" name="siteId" class="short-input" maxlength="25">
+                </div>
+
+                <div class="form-group">
+                    <label for="siteName">SITE NAME</label>
+                    <input type="text" id="siteName" name="siteName" class="short-input" maxlength="25">
+                </div>
+
+                <div class="form-group">
+                    <label for="siteStatus">SITE STATUS</label>
+                    <select id="siteStatus" name="siteStatus" class="short-input"> 
+                        <option>NEW</option>
+                        <option>ASSIGNED</option>
+                        <option>SOLD</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="plotNo">PLOT NO</label>
+                   <input type="text" id="plotNo" name="plotNo" class="short-input" maxlength="25">
+                </div>
+
+                <div class="form-group">
+                    <label for="sizes">SIZES</label>
+                   <input type="text" id="sizes" name="sizes" class="short-input" maxlength="25">
+                </div>
+
+                <div class="form-group">
+                    <label for="facing">FACING</label>
+                   <input type="text" id="facing" name="facing" class="short-input" maxlength="25">
+                </div>
+
+                <div class="form-group">
+                    <label for="nAxis">N_AXIS</label>
+                    <input type="text" id="nAxis" name="nAxis" class="short-input" maxlength="25">
+                </div>
+
+                <div class="form-group">
+                    <label for="sAxis">S_AXIS</label>
+                  <input type="text" id="sAxis" name="sAxis" class="short-input" maxlength="25">
+                </div>
+
+                <div class="form-group">
+                    <label for="layout">LAYOUT</label>
+                    <input type="text" id="layout" name="layout" class="short-input" maxlength="25">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">ADDRESS</label>
+                    <input type="text" id="address" name="address" class="short-input" maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="remarks">REMARKS</label>
+                    <input type="text" id="remarks" name="remarks" class="short-input" maxlength="50">
+                </div>
+
+                <button type="button" class="add-site-btn" onclick="addSite()">ADD SITE</button>
+            </form>
+        </div>
+
+    </div>
+    <div id="allSitesContainer" style="display: none; margin-top: 20px;"></div>
+
+
+</body>
+</html>

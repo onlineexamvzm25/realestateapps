@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Reports</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+      color: #333;
+    }
+    h2 {
+      text-align: center;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .radio-group, .select-group, .buttons {
+      margin-bottom: 20px;
+    }
+    label {
+      margin-right: 15px;
+    }
+    select, button {
+      padding: 10px;
+      margin-top: 10px;
+      margin-right: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f7f7f7;
+    }
+    .buttons button {
+      background-color: #007BFF;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .buttons button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Select Report Type</h2>
+
+    <div class="radio-group">
+      <label><input type="radio" name="reportType" value="site" /> Customers of a site</label>
+      <label><input type="radio" name="reportType" value="customer" /> Sites of a customer</label>
+    </div>
+
+    <div class="select-group">
+      <select id="dynamicSelect" style="display:none;"></select>
+    </div>
+
+    <div class="buttons">
+      <button onclick="showReport()">SHOW REPORT</button>
+      <button onclick="downloadPDF()">Download PDF</button>
+      <button onclick="goHome()">Home</button>
+    </div>
+
+    <table id="resultsTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>Site ID</th>
+          <th>Site Name</th>
+          <th>Customer ID</th>
+          <th>Customer Name</th>
+          <th>Contact No</th>
+          <th>Shown Date</th>
+          <th>Shown By</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    // Supabase config
+    // Supabase credentials
+    const supabaseUrl = 'https://rqsiopzedqyucvptwsjk.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxc2lvcHplZHF5dWN2cHR3c2prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2MTg4NjgsImV4cCI6MjA3MjE5NDg2OH0.rY6opU6M5UMaaUe2Mp9FjVOue9Vd9_8vXruJ3Vts_Ww';
+
+    supabase = supabase.createClient(supabaseUrl, supabaseKey); // ✅ Use window
+
+    let selectedValue = null;
+    let reportType = null;
+
+    const dynamicSelect = document.getElementById("dynamicSelect");
+
+    // Listen for radio button changes
+    document.querySelectorAll('input[name="reportType"]').forEach((el) => {
+      el.addEventListener("change", async (e) => {
+        reportType = e.target.value;
+        dynamicSelect.style.display = "inline-block";
+        dynamicSelect.innerHTML = "";
+
+        if (reportType === "site") {
+          const { data, error } = await supabase.from("sites").select("sid, sname");
+          if (!error) {
+            data.forEach(site => {
+              const option = document.createElement("option");
+              option.value = site.sid;
+              option.textContent = site.sname;
+              dynamicSelect.appendChild(option);
+            });
+          }
+        } else if (reportType === "customer") {
+          const { data, error } = await supabase.from("customers").select("cid, cname");
+          if (!error) {
+            data.forEach(cust => {
+              const option = document.createElement("option");
+              option.value = cust.cid;
+              option.textContent = cust.cname;
+              dynamicSelect.appendChild(option);
+            });
+          }
+        }
+      });
+    });
+
+    async function showReport() {
+
+  const selectedRadio = document.querySelector('input[name="reportType"]:checked');
+  if (!selectedRadio) {
+    alert("Please select a report type.");
+    return;
+  }
+
+  const value = dynamicSelect.value;
+  if (!value) {
+    alert("Please select an option from the dropdown.");
+    return;
+  }
+      
+      let matchColumn = reportType === "site" ? "sid" : "cid";
+      const { data, error } = await supabase
+        .from("sitewithcustomers")
+        .select("*")
+        .eq(matchColumn, value);
+
+      if (error) {
+        alert("Failed to fetch data");
+        return;
+      }
+
+      const table = document.getElementById("resultsTable");
+      const tbody = table.querySelector("tbody");
+      tbody.innerHTML = "";
+
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.sid}</td>
+          <td>${row.sname}</td>
+          <td>${row.cid}</td>
+          <td>${row.cname}</td>
+          <td>${row.contactno}</td>
+          <td>${row.showndate}</td>
+          <td>${row.shownby}</td>
+          <td>${row.remarks}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      table.style.display = data.length ? "table" : "none";
+    }
+
+    async function downloadPDF() {
+      const table = document.getElementById("resultsTable");
+      if (table.style.display === "none") {
+        alert("No data to download.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.text("Report", 14, 16);
+      const headers = [["Site ID", "Site Name", "Customer ID", "Customer Name", "Contact No", "Shown Date", "Shown By", "Remarks"]];
+
+      const rows = Array.from(table.querySelectorAll("tbody tr")).map(row =>
+        Array.from(row.children).map(cell => cell.textContent)
+      );
+
+      doc.autoTable({
+        head: headers,
+        body: rows,
+        startY: 20,
+        styles: { fontSize: 8 },
+      });
+
+      doc.save("report.pdf");
+    }
+
+    function goHome() {
+      window.location.href = "homepage.html";
+    }
+  </script>
+
+  <!-- AutoTable plugin for jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+</body>
+</html>
