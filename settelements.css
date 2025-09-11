@@ -1,0 +1,165 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #eef2f7;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+}
+
+.button-group {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.button-group button {
+  margin: 10px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 8px;
+  background: #0077cc;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.1s;
+}
+
+.button-group button:hover {
+  background: #005fa3;
+  transform: translateY(-2px);
+}
+
+/* ----- Form Styling ----- */
+.form-section {
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 12px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
+}
+
+.form-section label {
+  display: block;
+  margin-top: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-section select,
+.form-section input[type="text"],
+.form-section input[type="date"],
+.form-section textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+textarea {
+  resize: none;
+  height: 80px;
+}
+
+.form-section button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.25s;
+}
+
+.form-section button:hover {
+  background: #218838;
+}
+
+/* ----- Radio Group ----- */
+.radio-box {
+  margin: 20px auto;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #fdfdfd;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.radio-box label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: normal;
+  color: #333;
+}
+
+/* ----- Settlement Table ----- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+table th,
+table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+table th {
+  background: #0077cc;
+  color: white;
+  font-weight: 600;
+}
+
+table tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+table tr:hover {
+  background: #eef7ff;
+}
+
+/* ----- Action Buttons above table ----- */
+.action-buttons {
+  margin: 15px 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.action-buttons button {
+  background: #444;
+  padding: 10px 18px;
+  border-radius: 8px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.action-buttons button:hover {
+  background: #000;
+}
+body { background: yellow !important; }
