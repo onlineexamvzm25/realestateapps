@@ -29,6 +29,9 @@ document.getElementById("btnAddSettlement").addEventListener("click", async () =
         <option value="Registered">Registered</option>
       </select>
 
+      <label>Amount</label>
+      <input type="number" id="amount" maxlength="100"></input>
+
       <label>Comments</label>
       <textarea id="comments" maxlength="100"></textarea>
 
@@ -58,6 +61,7 @@ document.getElementById("btnAddSettlement").addEventListener("click", async () =
     const custName = custSelect.options[custSelect.selectedIndex]?.dataset.name || "";
     const setDate = document.getElementById("setDate").value;
     const setType = document.getElementById("setType").value;
+    const amount = document.getElementById("amount").value;
     const comments = document.getElementById("comments").value;
 
     if (!siteId || !custId || !setDate || !setType) {
@@ -77,7 +81,8 @@ document.getElementById("btnAddSettlement").addEventListener("click", async () =
       cname: custName,
       setdate: setDate,
       settype: setType,
-      comments: comments
+      comments: comments,
+      amount: amount
     }]);
 
     if (error) {
@@ -131,7 +136,7 @@ document.getElementById("btnShowSettlements").addEventListener("click", () => {
       <table>
         <thead>
           <tr>
-            <th>ID</th><th>Site</th><th>Customer</th><th>Date</th><th>Type</th><th>Comments</th>
+            <th>ID</th><th>Site</th><th>Customer</th><th>Date</th><th>Type</th><th>Amount</th><th>Comments</th>
           </tr>
         </thead>
         <tbody>
@@ -142,6 +147,7 @@ document.getElementById("btnShowSettlements").addEventListener("click", () => {
               <td>${d.cname}</td>
               <td>${d.setdate}</td>
               <td>${d.settype}</td>
+              <td>${d.amount}</td>
               <td>${d.comments || ""}</td>
             </tr>
           `).join("")}
@@ -154,17 +160,37 @@ document.getElementById("btnShowSettlements").addEventListener("click", () => {
       document.getElementById("settlementTable").innerHTML = "";
     };
 
-    document.getElementById("downloadPdf").onclick = () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text("Settlements Report", 14, 20);
-      let y = 30;
-      data.forEach(row => {
-        doc.text(`${row.setid} | ${row.sname} | ${row.cname} | ${row.setdate} | ${row.settype} | ${row.comments || ""}`, 14, y);
-        y += 10;
-      });
-      doc.save("settlements.pdf");
-    };
+   document.getElementById("downloadPdf").onclick = () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.text("Settlements Report", 14, 20);
+
+  // Convert your data into rows
+  const headers = [["Set ID", "Settlement Name", "Customer Name", "Date", "Type", "Amount", "Comments"]];
+  const rows = data.map(row => [
+    row.setid,
+    row.sname,
+    row.cname,
+    row.setdate,
+    row.settype,
+    row.amount,
+    row.comments || ""
+  ]);
+
+  // AutoTable handles borders and styling
+  doc.autoTable({
+    startY: 30,
+    head: headers,
+    body: rows,
+    theme: "grid",   // "grid" = borders, "striped" = alternate row colors, "plain" = no borders
+    styles: { fontSize: 10, cellPadding: 3 },
+    headStyles: { fillColor: [22, 160, 133] } // optional header color
+  });
+
+  doc.save("settlements.pdf");
+  };
+
   });
 });
 

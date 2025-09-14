@@ -62,6 +62,7 @@ h1 {
 .form-section select,
 .form-section input[type="text"],
 .form-section input[type="date"],
+.form-section input[type="number"],
 .form-section textarea {
   width: 100%;
   padding: 10px;
@@ -162,4 +163,4 @@ table tr:hover {
 .action-buttons button:hover {
   background: #000;
 }
-body { background: yellow !important; }
+body { background: rgb(181, 171, 127) !important; }

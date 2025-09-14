@@ -61,7 +61,7 @@
 </head>
 <body>
   <div class="container">
-    <h2>Select Report Type</h2>
+    <h2>CUSTOMER VISIT REPORTS</h2>
 
     <div class="radio-group">
       <label><input type="radio" name="reportType" value="site" /> Customers of a site</label>
@@ -75,18 +75,20 @@
     <div class="buttons">
       <button onclick="showReport()">SHOW REPORT</button>
       <button onclick="downloadPDF()">Download PDF</button>
+      <button onclick="showSettlements()">Settlements</button>
       <button onclick="goHome()">Home</button>
     </div>
 
     <table id="resultsTable" style="display:none;">
       <thead>
         <tr>
+          <th>Customer ID</th>
           <th>Site ID</th>
           <th>Site Name</th>
-          <th>Customer ID</th>
           <th>Customer Name</th>
           <th>Contact No</th>
           <th>Shown Date</th>
+          <th>Expenditure</th>
           <th>Shown By</th>
           <th>Remarks</th>
         </tr>
@@ -171,12 +173,13 @@
       data.forEach(row => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
+          <td>${row.cid}</td>
           <td>${row.sid}</td>
           <td>${row.sname}</td>
-          <td>${row.cid}</td>
           <td>${row.cname}</td>
           <td>${row.contactno}</td>
           <td>${row.showndate}</td>
+          <td>${row.expenditure}</td>
           <td>${row.shownby}</td>
           <td>${row.remarks}</td>
         `;
@@ -212,6 +215,10 @@
 
       doc.save("report.pdf");
     }
+
+  function showSettlements(){
+    window.location.href = "settelements.html";
+  }
 
     function goHome() {
       window.location.href = "index.html";

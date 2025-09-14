@@ -23,6 +23,9 @@
     <label for="dateSelect">VISITED DATE:</label>
     <input type="date" id="dateSelect">
 
+    <label for="remarks">EXPENDITURE:</label>
+    <input type="text" id="expenditure"  placeholder="Enter Visit Expenditure">
+
     <label for="remarks">VISIT COMMENTS:</label>
     <input type="text" id="remarks" maxlength="100" placeholder="Enter remarks (max 100 chars)">
 
@@ -112,6 +115,7 @@
       const sid = document.getElementById('siteSelect').value;
       const cid = document.getElementById('customerSelect').value;
       const showndate = document.getElementById('dateSelect').value;
+      const expenditure = document.getElementById('expenditure').value;
       const remarks = document.getElementById('remarks').value;
       const shownby = 'MAHESH';
 
@@ -127,7 +131,7 @@
     
 
       const { error } = await supabase.from('sitewithcustomers').insert([
-        { sid, sname, cid, cname, contactno, showndate, remarks, shownby }
+        { sid, sname, cid, cname, contactno, showndate, expenditure, remarks, shownby }
       ]);
 
       const statusMsg = document.getElementById('statusMsg');
@@ -142,6 +146,7 @@
         document.getElementById('siteSelect').value = '';
         document.getElementById('customerSelect').value = '';
         document.getElementById('remarks').value = '';
+        document.getElementById('expenditure').value = '';
         document.getElementById('dateSelect').valueAsDate = new Date();  // Reset to today's date
       }
     }
